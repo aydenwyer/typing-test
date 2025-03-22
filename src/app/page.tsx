@@ -11,7 +11,13 @@ export default function Home() {
 	const [cursorTop, setCursorTop] = useState(4);
 	const [visibleLine, setVisibleLine] = useState(0);
 	const [randomWords, setRandomWords] = useState<string[]>([]);
+	const [isJiggling, setIsJiggling] = useState(false);
+	const [isRunning, setIsRunning] = useState(false);
+	const [timer, setTimer] = useState({start: 0, end: 0})
+	const intervalRef = useRef<NodeJS.Timeout | null>(null);
 	const [previousCursorLeft, setPreviousCursorLeft] = useState<number[]>([]);
+
+	const jiggleTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	const wordsPerPage = 50;
 
@@ -21,12 +27,31 @@ export default function Home() {
 	);
 
 	useEffect(() => {
-		setRandomWords(words.sort(() => 0.5 - Math.random()).slice(0, wordsPerPage));
+		setRandomWords(
+			words.sort(() => 0.5 - Math.random()).slice(0, wordsPerPage)
+		);
 	}, []);
-	
-	useEffect(() => {
 
-	}, )
+	useEffect(() => {
+		if (currentWord + 1 === wordsPerPage && currentLetter === randomWords[currentWord].length) {
+			const currentDate = new Date();
+			setTimer((prev) => ({start: prev.start, end: currentDate.getTime()}));
+		}
+	}, [currentWord, currentLetter])
+
+	useEffect(() => {
+		if (timer.end) { // This will run only after `timer.end` has been updated
+			const timeElapsedInMinutes = ((timer.end - timer.start) * 0.001) / 60;
+
+			if (timeElapsedInMinutes <= 0) {
+				console.log("WPM Calculation Error: Time elapsed too short");
+				return;
+			}
+
+			const wpm = wordsPerPage / timeElapsedInMinutes;
+			console.log(wpm);
+		}
+	}, [timer.end]);
 
 	// Ref to store width of container so we know when the cursor should switch lines
 	const containerRef = useRef<HTMLDivElement | null>(null);
@@ -38,12 +63,21 @@ export default function Home() {
 			const isWithinWord = currentLetter < words[currentWord]?.length;
 			const isEndOfWord = currentLetter === words[currentWord]?.length;
 
+			if (!isRunning) {
+				setIsRunning(true); // Start timer on first keypress
+				const currentDate = new Date();
+				setTimer({start: currentDate.getTime(), end: 0})
+
+				console.log(currentDate.getTime());
+			}
+
 			const moveCursorX = (offset: number) => {
 				setCursorLeft((prev) => prev + offset);
 			};
 
 			const getLetterWidth = (wordIndex: number, letterIndex: number) =>
-				letterRefs.current[wordIndex]?.[letterIndex]?.getBoundingClientRect().width || 0;
+				letterRefs.current[wordIndex]?.[letterIndex]?.getBoundingClientRect()
+					.width || 0;
 
 			// Handle Backspace
 			if (key === "Backspace") {
@@ -70,8 +104,8 @@ export default function Home() {
 					moveCursorX(previousCursorLeft[previousCursorLeft.length - 1]);
 
 					// Pop old cursor position so next line accesses the correct value
-					setPreviousCursorLeft(prev => prev.slice(0,-1));
-					
+					setPreviousCursorLeft((prev) => prev.slice(0, -1));
+
 					const newCursorTop = cursorTop - 44;
 
 					// If the new calculated cusor position is going to the third line of text
@@ -102,7 +136,7 @@ export default function Home() {
 			}
 
 			// Handle Space (move to the next word)
-			if (key === " " && isEndOfWord) {
+			if (key === " " && isEndOfWord && currentWord + 1 < wordsPerPage) {
 				setCurrentWord((prev) => prev + 1);
 				setCurrentLetter(0);
 
@@ -115,7 +149,7 @@ export default function Home() {
 				// Check if the width of the next word plus the current cursor position
 				// will overflow the edge of the container, if so, move to the next line.
 				if (
-					cursorLeft + nextWordWidth + 16  >=
+					cursorLeft + nextWordWidth + 16 >=
 					(containerRef.current?.getBoundingClientRect().width || 0)
 				) {
 					setCursorLeft(0);
@@ -138,9 +172,17 @@ export default function Home() {
 					moveCursorX(8);
 				}
 				return;
-			}
+			} else if (isEndOfWord && key !== " " && key.length === 1 && currentWord + 1 < wordsPerPage) {
+				if (!isJiggling) {
+					setIsJiggling(true);
 
-			
+					if (jiggleTimeout.current) clearTimeout(jiggleTimeout.current);
+
+					jiggleTimeout.current = setTimeout(() => setIsJiggling(false), 50);
+				}
+
+				return;
+			}
 		},
 		[currentLetter, currentWord]
 	);
@@ -161,8 +203,9 @@ export default function Home() {
 			>
 				<div
 					className={clsx(
-						"w-[3px] h-[35px] bg-accent rounded-full absolute transition-all duration-[25ms] ease-out",
-						{ "animate-flash": cursorLeft === 0 && cursorTop === 4 }
+						"w-[3px] h-[35px] bg-accent rounded-full absolute transition-all duration-[50ms] ease-out",
+						{ "animate-flash": cursorLeft === 0 && cursorTop === 4 },
+						{ "animate-jiggle": isJiggling }
 					)}
 					style={{ left: `${cursorLeft}px`, top: `${cursorTop}px` }}
 				></div>

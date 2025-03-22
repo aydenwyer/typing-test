@@ -27,11 +27,19 @@
 
 @theme {
   --animate-flash: flash 1s infinite;
+  --animate-jiggle: jiggle .2s ease-in-out;
 
   @keyframes flash {
     50% {
       opacity: 0;
     }
+  };
+
+  @keyframes jiggle {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(5px);}
+    50% { transform: translateX(-1px);}
+    75% { transform: translateX(2px);}
   }
 }
 
