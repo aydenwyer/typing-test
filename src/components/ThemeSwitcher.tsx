@@ -25,10 +25,15 @@ const ThemeSwitcher = () => {
 		setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
 	};
 
+	const handleNonMouseEvent = (event: any) => {
+		event.preventDefault();
+	};
+
 	return (
 		<button
-			className="cursor-pointer"
+			className="cursor-pointer focus:outline-none"
 			onClick={handleTheme}
+			onKeyDown={handleNonMouseEvent}
 		>
 			Toggle Theme
 		</button>
