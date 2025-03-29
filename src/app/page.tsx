@@ -7,26 +7,21 @@ import { useEffect, useState } from "react";
 
 export const wordsPerPage = 10;
 
+export type KeyData = { key: string; correct: number; incorrect: number }[];
+
 export default function Home() {
 	const [timer, setTimer] = useState<{ start: number; end: number }>({
 		start: 0,
 		end: 0,
 	});
 	const [testComplete, setTestComplete] = useState(false);
-	const [wpm, setWpm] = useState(0);
-	const [keyData, setKeyData] = useState<any[]>([])
+	const [timeElapsedInMin, setTimeElapsedInMin] = useState(0);
+	const [keyData, setKeyData] = useState<KeyData>([])
 
 	useEffect(() => {
 		if (timer.end) {
 			// This will run only after `timer.end` has been updated
-			const timeElapsedInMinutes = ((timer.end - timer.start) * 0.001) / 60;
-
-			if (timeElapsedInMinutes <= 0) {
-				console.log("WPM Calculation Error: Time elapsed too short");
-				return;
-			}
-
-			setWpm(wordsPerPage / timeElapsedInMinutes);
+			setTimeElapsedInMin(((timer.end - timer.start) * 0.001) / 60);
 
 			setTimeout(() => {
 				setTestComplete(true);
@@ -45,7 +40,7 @@ export default function Home() {
 					)}
 				>
 					{testComplete && (
-						<TestResults wpm={wpm} keyData={keyData}/>
+						<TestResults timeElapsed={timeElapsedInMin} keyData={keyData}/>
 					)}
 				</div>
 			</div>

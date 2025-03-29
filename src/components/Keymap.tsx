@@ -1,4 +1,6 @@
 import clsx from "clsx";
+import Key from "./Key";
+import { KeyData } from "@/app/page";
 
 const qwertyKeys = [
 	["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
@@ -6,9 +8,9 @@ const qwertyKeys = [
 	["z", "x", "c", "v", "b", "n", "m"],
 ];
 
-type KeyData = [{ key: string; correct: number; incorrect: number }];
-
 const Keymap = ({ keyData }: { keyData: KeyData }) => {
+	
+
 	return (
 		<div>
 			<div className="flex flex-col gap-1">
@@ -22,22 +24,7 @@ const Keymap = ({ keyData }: { keyData: KeyData }) => {
 						)}
 					>
 						{row.map((char, idx) => (
-							<div
-								key={idx}
-								className={clsx(
-									"w-[60px] aspect-square border-1 rounded-sm flex items-center justify-center text-foreground/20",
-									keyData.some(
-										(entry) => entry.key === char && entry.incorrect === 0
-									) && "!text-foreground bg-foreground/5",
-									keyData.some(
-										(entry) => entry.key === char && entry.correct === 0
-									) && "!text-error bg-error/5",
-									keyData.some((entry) => entry.key === char) &&
-										"!text-accent bg-accent/5"
-								)}
-							>
-								{char}
-							</div>
+							<Key key={idx} keyData={keyData.find((entry) => entry.key === char)} char={char}/>
 						))}
 					</div>
 				))}
