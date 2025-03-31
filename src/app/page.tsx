@@ -5,7 +5,7 @@ import TestResults from "@/components/TestResults";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-export const wordsPerPage = 10;
+export const wordsPerPage = 30;
 
 export type KeyData = { key: string; correct: number; incorrect: number }[];
 
@@ -30,7 +30,7 @@ export default function Home() {
 	}, [timer.end]);
 
 	return (
-		<div className="w-full h-nav flex items-center justify-center">
+		<div className="w-full h-[calc(100vh_-_var(--nav-height))] flex items-center justify-center">
 			<div className="max-w-5xl w-full">
 				{!testComplete && <Test setTimer={setTimer} setKeyData={setKeyData} keyData={keyData}/>}
 				<div

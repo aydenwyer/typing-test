@@ -6,7 +6,7 @@
   --accent: #FDC700;
   --error: #FF6467;
 
-  --vp-height: calc(100vh - 20px);
+  --nav-height: 84px;
 }
 
 @theme inline {
@@ -15,7 +15,7 @@
   --color-accent: var(--accent);
   --color-error: var(--error);
 
-  --height-nav: var(--vp-height);
+  --height-nav-height: var(--nav-height);
 }
 
 @media (prefers-color-scheme: dark) {

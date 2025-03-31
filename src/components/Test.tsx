@@ -15,7 +15,7 @@ import { wordsPerPage } from "@/app/page";
 export default function Home({
 	setTimer,
 	setKeyData,
-	keyData
+	keyData,
 }: {
 	setTimer: Dispatch<
 		SetStateAction<{
@@ -23,13 +23,15 @@ export default function Home({
 			end: number;
 		}>
 	>;
-	setKeyData: Dispatch<
-	SetStateAction<any[]>>;
-	keyData: any[]
+	setKeyData: Dispatch<SetStateAction<any[]>>;
+	keyData: any[];
 }) {
+	const charHeight = 48;
+	const wordSpacing = 6;
+
 	const [currentLetter, setCurrentLetter] = useState(0);
 	const [currentWord, setCurrentWord] = useState(0);
-	const [cursorLeft, setCursorLeft] = useState(0);
+	const [cursorLeft, setCursorLeft] = useState(wordSpacing - 4);
 	const [cursorTop, setCursorTop] = useState(4);
 	const [visibleLine, setVisibleLine] = useState(0);
 	const [randomWords, setRandomWords] = useState<string[]>([]);
@@ -86,15 +88,23 @@ export default function Home({
 				letterRefs.current[wordIndex]?.[letterIndex]?.getBoundingClientRect()
 					.width || 0;
 
-			const insertKeyData = (key: string, correct: number, incorrect: number) => {
-				setKeyData(prevKeyData => {
-					const existingEntry = prevKeyData.find(entry => entry.key === key);
-			
+			const insertKeyData = (
+				key: string,
+				correct: number,
+				incorrect: number
+			) => {
+				setKeyData((prevKeyData) => {
+					const existingEntry = prevKeyData.find((entry) => entry.key === key);
+
 					if (existingEntry) {
 						// Update existing entry
-						return prevKeyData.map(entry =>
+						return prevKeyData.map((entry) =>
 							entry.key === key
-								? { ...entry, correct: entry.correct + correct, incorrect: entry.incorrect + incorrect }
+								? {
+										...entry,
+										correct: entry.correct + correct,
+										incorrect: entry.incorrect + incorrect,
+								  }
 								: entry
 						);
 					} else {
@@ -102,7 +112,7 @@ export default function Home({
 						return [...prevKeyData, { key, correct, incorrect }];
 					}
 				});
-			}
+			};
 
 			// Handle Backspace
 			if (key === "Backspace") {
@@ -122,7 +132,7 @@ export default function Home({
 				else if (currentWord > 0 && cursorLeft > 0) {
 					setCurrentWord((prev) => prev - 1);
 					setCurrentLetter(randomWords[currentWord - 1].length);
-					moveCursorX(-8);
+					moveCursorX(-wordSpacing * 2);
 				} else if (currentWord > 0) {
 					setCurrentWord((prev) => prev - 1);
 					setCurrentLetter(randomWords[currentWord - 1].length);
@@ -131,7 +141,7 @@ export default function Home({
 					// Pop old cursor position so next line accesses the correct value
 					setPreviousCursorLeft((prev) => prev.slice(0, -1));
 
-					const newCursorTop = cursorTop - 44;
+					const newCursorTop = cursorTop - charHeight;
 
 					// If the new calculated cusor position is going to the third line of text
 					// move the text up
@@ -180,27 +190,27 @@ export default function Home({
 				// Check if the width of the next word plus the current cursor position
 				// will overflow the edge of the container, if so, move to the next line.
 				if (
-					cursorLeft + nextWordWidth + 16 >=
+					cursorLeft + nextWordWidth + wordSpacing * 4 >=
 					(containerRef.current?.getBoundingClientRect().width || 0)
 				) {
-					setCursorLeft(0);
+					setCursorLeft(wordSpacing - 4);
 
 					// Push old cursor position to array
 					setPreviousCursorLeft([...previousCursorLeft, cursorLeft]);
 
 					// Get the new cursor distance from the top of the container
-					// Word height is 44 pixels with margin
-					const newCursorTop = cursorTop + 44;
+					// Word height is charHeight pixels with margin
+					const newCursorTop = cursorTop + charHeight;
 
 					// If the new calculated cursor position is going to the third line of text
 					// move the text up
-					if (newCursorTop >= 88) {
+					if (newCursorTop >= charHeight * 2) {
 						setVisibleLine((prev) => prev + 1);
 					} else {
 						setCursorTop(newCursorTop);
 					}
 				} else {
-					moveCursorX(8);
+					moveCursorX(wordSpacing * 2);
 				}
 				return;
 			} else if (
@@ -234,24 +244,34 @@ export default function Home({
 	return (
 		<div
 			ref={containerRef}
-			className="w-full relative overflow-hidden max-h-[calc(44px_*_3)] transition-opacity duration-300"
+			className="w-full relative overflow-hidden transition-opacity duration-300"
+			style={{ maxHeight: charHeight * 3 }}
 		>
+			{/* CURSOR ------------------------------*/}
 			<div
 				className={clsx(
-					"w-[3px] h-[35px] bg-accent rounded-full absolute transition-all duration-[50ms] ease-out",
-					{ "animate-flash": cursorLeft === 0 && cursorTop === 4 },
+					"w-[3px] bg-accent rounded-full absolute transition-all duration-75 ease-out",
+					{
+						"animate-flash": cursorLeft === wordSpacing - 4 && cursorTop === 4,
+					},
 					{ "animate-jiggle": isJiggling }
 				)}
-				style={{ left: `${cursorLeft}px`, top: `${cursorTop}px` }}
+				style={{
+					height: charHeight - 8,
+					left: `${cursorLeft}px`,
+					top: `${cursorTop}px`,
+				}}
 			></div>
+			{/* CURSOR END --------------------------*/}
 			<div
 				className="flex flex-wrap w-full"
-				style={{ transform: `translateY(-${visibleLine * 44}px)` }}
+				style={{ transform: `translateY(-${visibleLine * charHeight}px)` }}
 			>
 				{randomWords.map((word, i) => (
 					<div
 						key={i}
-						className="flex mx-[4px] my-[4px] text-3xl tracking-wider text-foreground/40"
+						className="flex my-[4px] text-4xl tracking-wider text-foreground/40"
+						style={{ marginInline: wordSpacing }}
 					>
 						{word.split("").map((letter, j) => (
 							<p

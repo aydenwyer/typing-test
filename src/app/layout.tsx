@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import SFProDisp from "next/font/local";
 import "./globals.css";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
+import Navbar from "@/components/Navbar";
 
 const sfProDisp = SFProDisp({
   src: [
@@ -39,9 +40,7 @@ export default function RootLayout({
       <body
         className={`${sfProDisp.className} antialiased font-normal`}
       >
-        <div className="h-[20px]">
-          <ThemeSwitcher />
-        </div>
+        <Navbar />
         {children}
       </body>
     </html>
