@@ -32,7 +32,7 @@ export default function Home() {
 	return (
 		<div className="w-full h-[calc(100vh_-_var(--nav-height))] flex items-center justify-center">
 			<div className="max-w-5xl w-full">
-				{!testComplete && <Test setTimer={setTimer} setKeyData={setKeyData} keyData={keyData}/>}
+				{!testComplete && <Test setTimer={setTimer} setKeyData={setKeyData}/>}
 				<div
 					className={clsx(
 						"transition-opacity duration-300 w-full",

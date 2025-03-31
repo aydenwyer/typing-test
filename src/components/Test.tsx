@@ -15,7 +15,6 @@ import { wordsPerPage } from "@/app/page";
 export default function Home({
 	setTimer,
 	setKeyData,
-	keyData,
 }: {
 	setTimer: Dispatch<
 		SetStateAction<{
@@ -24,7 +23,6 @@ export default function Home({
 		}>
 	>;
 	setKeyData: Dispatch<SetStateAction<any[]>>;
-	keyData: any[];
 }) {
 	const charHeight = 48;
 	const wordSpacing = 6;
@@ -129,14 +127,14 @@ export default function Home({
 					}
 				}
 				// On first letter of word and previous word contains error
-				else if (currentWord > 0 && cursorLeft > 0) {
+				else if (currentWord > 0 && cursorLeft > wordSpacing - 4) {
 					setCurrentWord((prev) => prev - 1);
 					setCurrentLetter(randomWords[currentWord - 1].length);
 					moveCursorX(-wordSpacing * 2);
-				} else if (currentWord > 0) {
+				} else if (currentWord > wordSpacing - 4) {
 					setCurrentWord((prev) => prev - 1);
 					setCurrentLetter(randomWords[currentWord - 1].length);
-					moveCursorX(previousCursorLeft[previousCursorLeft.length - 1]);
+					setCursorLeft(previousCursorLeft[previousCursorLeft.length - 1]);
 
 					// Pop old cursor position so next line accesses the correct value
 					setPreviousCursorLeft((prev) => prev.slice(0, -1));
@@ -190,7 +188,7 @@ export default function Home({
 				// Check if the width of the next word plus the current cursor position
 				// will overflow the edge of the container, if so, move to the next line.
 				if (
-					cursorLeft + nextWordWidth + wordSpacing * 4 >=
+					cursorLeft + (nextWordWidth + wordSpacing * 2) + wordSpacing + 4 >=
 					(containerRef.current?.getBoundingClientRect().width || 0)
 				) {
 					setCursorLeft(wordSpacing - 4);
@@ -270,7 +268,7 @@ export default function Home({
 				{randomWords.map((word, i) => (
 					<div
 						key={i}
-						className="flex my-[4px] text-4xl tracking-wider text-foreground/40"
+						className="flex my-[4px] text-4xl tracking-wider text-foreground/30"
 						style={{ marginInline: wordSpacing }}
 					>
 						{word.split("").map((letter, j) => (
