@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import SFProDisp from "next/font/local";
 import "./globals.css";
-import ThemeSwitcher from "@/components/ThemeSwitcher";
 import Navbar from "@/components/Navbar";
 
 const sfProDisp = SFProDisp({

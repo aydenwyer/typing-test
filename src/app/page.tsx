@@ -2,12 +2,12 @@
 
 import Test from "@/components/Test";
 import TestResults from "@/components/TestResults";
+import WordsPerPageSwitcher from "@/components/WordsPerPageSwitcher";
+import { ContextProvider } from "@/context/WordsPerPageContext";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 
-export const wordsPerPage = 30;
-
-export type KeyData = { key: string; correct: number; incorrect: number }[];
+export type KeyData = { key: string; corrcect: number; incorrect: number }[];
 
 export default function Home() {
 	const [timer, setTimer] = useState<{ start: number; end: number }>({
@@ -16,7 +16,7 @@ export default function Home() {
 	});
 	const [testComplete, setTestComplete] = useState(false);
 	const [timeElapsedInMin, setTimeElapsedInMin] = useState(0);
-	const [keyData, setKeyData] = useState<KeyData>([])
+	const [keyData, setKeyData] = useState<KeyData>([]);
 
 	useEffect(() => {
 		if (timer.end) {
@@ -31,8 +31,17 @@ export default function Home() {
 
 	return (
 		<div className="w-full h-[calc(100vh_-_var(--nav-height))] flex items-center justify-center">
-			<div className="max-w-5xl w-full">
-				{!testComplete && <Test setTimer={setTimer} setKeyData={setKeyData}/>}
+			<div className="max-w-5xl w-full pb-48">
+				<ContextProvider>
+				{!testComplete && (
+					<div className="flex flex-col gap-24">
+						<WordsPerPageSwitcher />
+						<Test
+							setTimer={setTimer}
+							setKeyData={setKeyData}
+						/>
+					</div>
+				)}
 				<div
 					className={clsx(
 						"transition-opacity duration-300 w-full",
@@ -40,9 +49,13 @@ export default function Home() {
 					)}
 				>
 					{testComplete && (
-						<TestResults timeElapsed={timeElapsedInMin} keyData={keyData}/>
+						<TestResults
+							timeElapsed={timeElapsedInMin}
+							keyData={keyData}
+						/>
 					)}
 				</div>
+				</ContextProvider>
 			</div>
 		</div>
 	);

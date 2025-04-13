@@ -1,5 +1,6 @@
-import { KeyData, wordsPerPage } from "@/app/page";
+import { KeyData } from "@/app/page";
 import Keymap from "./Keymap";
+import { useWordsPerPage } from "@/context/WordsPerPageContext";
 
 const TestResults = ({
 	timeElapsed,
@@ -8,6 +9,8 @@ const TestResults = ({
 	timeElapsed: number;
 	keyData: KeyData;
 }) => {
+	const { wordsPerPage } = useWordsPerPage();
+
 	var minutes = 0;
 	var seconds = 0;
 

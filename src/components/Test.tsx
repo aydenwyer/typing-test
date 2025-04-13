@@ -10,7 +10,7 @@ import {
 	useState,
 } from "react";
 import { words } from "@/utils/words";
-import { wordsPerPage } from "@/app/page";
+import { useWordsPerPage } from "@/context/WordsPerPageContext";
 
 export default function Home({
 	setTimer,
@@ -37,6 +37,8 @@ export default function Home({
 	const [isRunning, setIsRunning] = useState(false);
 	const [previousCursorLeft, setPreviousCursorLeft] = useState<number[]>([]);
 
+	const { wordsPerPage } = useWordsPerPage();
+
 	const jiggleTimeout = useRef<NodeJS.Timeout | null>(null);
 
 	// Array to store letter refs
@@ -48,7 +50,7 @@ export default function Home({
 		setRandomWords(
 			words.sort(() => 0.5 - Math.random()).slice(0, wordsPerPage)
 		);
-	}, []);
+	}, [wordsPerPage]);
 
 	useEffect(() => {
 		if (
