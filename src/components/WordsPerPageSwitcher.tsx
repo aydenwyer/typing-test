@@ -1,7 +1,12 @@
 import { useWordsPerPage } from "@/context/WordsPerPageContext";
+import clsx from "clsx";
 import { useEffect, useState } from "react";
 
 type WordsPerPageValueType = 15 | 30 | 60;
+
+const wordsPerPageOptions: WordsPerPageValueType[] = [
+	15, 30, 60
+]
 
 const WordsPerPageSwitcher = () => {
 	const { wordsPerPage, setWordsPerPage } = useWordsPerPage();
@@ -26,27 +31,15 @@ const WordsPerPageSwitcher = () => {
 
 	return (
 		<div className="relative flex justify-center items-center w-fit p-1 bg-foreground/5 border-[1px] border-foreground/7 rounded-md gap-1">
-			<div
-				id="15"
-				className="flex items-center justify-center text-md p-1 h-9 w-12 cursor-pointer"
+			{wordsPerPageOptions.map((item, idx) => (<div
+				id={item.toString()}
+				key={idx}
+				className={clsx("flex items-center justify-center text-md p-1 h-9 w-12 cursor-pointer", selected?.id === item.toString() ? "text-foreground" : "text-foreground/40")}
 				onClick={(e) => handleClick(e)}
 			>
-				15
+				{item}
 			</div>
-			<div
-				id="30"
-				className="flex items-center justify-center text-md p-1 h-9 w-12 cursor-pointer"
-				onClick={(e) => handleClick(e)}
-			>
-				30
-			</div>
-			<div
-				id="60"
-				className="flex items-center justify-center text-md p-1 h-9 w-12 cursor-pointer"
-				onClick={(e) => handleClick(e)}
-			>
-				60
-			</div>
+			))}
 			{selected && (
 				<div
 					className="absolute transition-all duration-150 ease-[cubic-bezier(.38,.83,.4,1.18)] w-12 h-9 bg-foreground/7 rounded-sm -z-1"
